@@ -1,14 +1,16 @@
 from VideoStream import VideoStream
 from aiortc import RTCPeerConnection, RTCSessionDescription
 
-async def offer(sio):
+def createPeerConnection():
     connection = RTCPeerConnection()
-    connection_id = "your_unique_connection_id"
 
     # Add your video stream to the connection
     video_stream = VideoStream()
     connection.addTrack(video_stream)
+    return connection
 
+async def offer(sio):
+    connection = createPeerConnection()
     # Create an SDP offer
     offer = await connection.createOffer()
     await connection.setLocalDescription(offer)
@@ -18,8 +20,8 @@ async def offer(sio):
         "type": offer.type,
         "sdp": offer.sdp,
     }
-    print("sending offer dict:")
-    print(offer_dict)
+    print("sending offer dict")
+    # print(offer_dict)
     sio.emit("pythonOffer", {"data": offer_dict})
 
 def handle_connect(sio):
@@ -27,6 +29,24 @@ def handle_connect(sio):
     # send message with the socket io
     sio.emit('pythonConnect')
 
-def handle_incoming_sdp(data):
+async def handle_incoming_sdp(data, sio):
     print("incoming sdp")
-    print(data)
+    # now, we create an offer and send it back
+    await answer(data["sdp"], sio)
+
+async def answer(sdp, sio):
+    connection = createPeerConnection()
+
+    # Create an SDP offer
+    await connection.setRemoteDescription(RTCSessionDescription(sdp, type="offer"))
+    rtcAnswer = await connection.createAnswer()
+    answer_dict = {
+        "type": rtcAnswer.type,
+        "sdp": rtcAnswer.sdp,
+        "socketId": sio.id
+    }
+    print(answer_dict)
+    sio.emit('pythonAnswer', answer_dict)
+
+def handle_incoming_sdp_notasync(data, sio):
+    print("incoming sdp")

@@ -1,7 +1,7 @@
 import cv2
 import asyncio
 import socketio
-from rtc_logic import offer, handle_connect, handle_incoming_sdp
+from rtc_logic import offer, handle_connect, handle_incoming_sdp, handle_incoming_sdp_notasync
 
 import numpy as np
 from webcoords import colorMask, createQuadrants, checkCoordinate, findMidpoint
@@ -20,19 +20,25 @@ async def main():
     @sio.event
     def disconnect():
         print('disconnected from server')
+        sio.emit('pythonDisconnect')
 
     # define a function to answer an incoming SDP
     @sio.event
     def incoming_sdp(data):
-        handle_incoming_sdp(data)
+        handle_incoming_sdp_notasync(data, sio)
 
     # actually connect now
     try:
         sio.connect('http://localhost:5000')
         # send the SDP connection request to all connected JS clients
-        await offer(sio)
     except:
-        print("Could not connect and make offer")
+        print("Could not connect: {e}")
+
+    try:
+        # make offer
+        await offer(sio)
+    except Exception as e:
+        print(f"Could not make offer: {type(e).__name__}: {e}")
 
     # end socket.io stuff
 
