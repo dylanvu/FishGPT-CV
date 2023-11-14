@@ -1,39 +1,44 @@
 import cv2
 import numpy as np
 
-# GamePlan
-# Read From WebCam
-# Apply Coordinates to the Video Received
-    # Apply Question Coordinates
-    # Can Be Scalable to how many questions/answers
-# Mask Out all the colors, Recognize Goldfish Color
-# Get Coordinates From Color
-# Check which Coordinate Matches From Color, Return Answer
+# creates the quadrants given the frame
+def createQuadrants(frame):
+    height, width, c = frame.shape
+    
+    midX = width // 2
+    midY = height // 2
+    
+    topLeft = [(0, midX), (0, midY)]
+    topRight = [(midX, width), (0, midY)]
+    bottomLeft = [(0, midX), (midY, height)]
+    bottomRight = [(midX, width), (midY, height)]
+    
+    # INDEX VALUES
+    # TOPLEFT: 0, TOPRIGHT: 1, BOTTOMLEFT: 2, BOTTOMRIGHT: 3
+    return [topLeft, topRight, bottomLeft, bottomRight]
+    
+# Input Coordinates, returns which quadrant it is in 
+def checkCoordinate(X: int, Y: int, Quadrants: list):
+    for quadX, quadY in Quadrants:
+        if quadX[0] <= X <= quadX[1] and quadY[0] <= Y <= quadY[1]:
+            return Quadrants.index([quadX, quadY])
 
-# Input Coordinates, Returns if it is in the Quadrant Parameter 
-def CheckCoordinate(X: int, Y: int, Quadrants: list):
-    return False
-
-# Apply Question & Emoji To Quadrant
-def QuestionQuadrants(Questions: list, Emojis: list, Quadrants: list):
-    return False
+# given, the box find the midpoint to get coordinate
+def findMidpoint(X1: int, X2: int, Y1: int, Y2: int):
+    return ( (X1 + X2) / 2, (Y1 + Y2) / 2)
 
 # Function To Get Colors
-def get_limits(color):
-    c = np.uint8([[color]])  # BGR values
-    hsvC = cv2.cvtColor(c, cv2.COLOR_BGR2HSV)
-
-    hue = hsvC[0][0][0]  # Get the hue value
-
-    # Handle red hue wrap-around
-    if hue >= 165:  # Upper limit for divided red hue
-        lowerLimit = np.array([hue - 10, 100, 100], dtype=np.uint8)
-        upperLimit = np.array([180, 255, 255], dtype=np.uint8)
-    elif hue <= 15:  # Lower limit for divided red hue
-        lowerLimit = np.array([0, 100, 100], dtype=np.uint8)
-        upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
-    else:
-        lowerLimit = np.array([hue - 10, 100, 100], dtype=np.uint8)
-        upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
-
-    return lowerLimit, upperLimit
+def colorMask(frame):
+    # converting BGR to HSV
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    
+    # Define the HSV range for orange
+    # orange is 27, 99, 233
+    lower_orange = np.array([5, 100, 100])
+    upper_orange = np.array([35, 255, 255])
+    
+    # create the mask
+    mask = cv2.inRange(hsv, lower_orange, upper_orange)
+    
+    return mask
+    
