@@ -20,7 +20,12 @@ async def offer(sio):
     }
     print("sending offer dict:")
     print(offer_dict)
-    sio.emit("openCVoffer", {"data": offer_dict})
+    sio.emit("pythonOffer", {"data": offer_dict})
+
+def handle_connect(sio):
+    print('connection established')
+    # send message with the socket io
+    sio.emit('pythonConnect')
 
 def handle_incoming_sdp(data):
     print("incoming sdp")

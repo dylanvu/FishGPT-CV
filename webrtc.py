@@ -1,7 +1,7 @@
 import cv2
 import asyncio
 import socketio
-from rtc_logic import offer, handle_incoming_sdp
+from rtc_logic import offer, handle_connect, handle_incoming_sdp
 
 import numpy as np
 
@@ -44,12 +44,12 @@ def get_limits(color):
 
 async def main():
 
-
+    # all the socket.io stuff
     sio = socketio.Client()
 
     @sio.event
     def connect():
-        print('connection established')
+        handle_connect(sio)
 
 
     @sio.event
@@ -69,7 +69,7 @@ async def main():
     except:
         print("Could not connect and make offer")
 
-    
+    # end socket.io stuff
 
     # now do all the openCV stuff
     # Turning Camera On -------------------------------------
