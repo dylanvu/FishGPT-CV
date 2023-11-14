@@ -1,5 +1,6 @@
 from VideoStream import VideoStream
 from aiortc import RTCPeerConnection, RTCSessionDescription
+
 async def offer(sio):
     connection = RTCPeerConnection()
     connection_id = "your_unique_connection_id"
@@ -17,4 +18,10 @@ async def offer(sio):
         "type": offer.type,
         "sdp": offer.sdp,
     }
+    print("sending offer dict:")
+    print(offer_dict)
     sio.emit("openCVoffer", {"data": offer_dict})
+
+def handle_incoming_sdp(data):
+    print("incoming sdp")
+    print(data)

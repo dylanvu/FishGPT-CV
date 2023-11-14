@@ -1,7 +1,7 @@
 import cv2
 import asyncio
 import socketio
-from rtc_logic import offer
+from rtc_logic import offer, handle_incoming_sdp
 
 import numpy as np
 
@@ -55,6 +55,11 @@ async def main():
     @sio.event
     def disconnect():
         print('disconnected from server')
+
+    # define a function to answer an incoming SDP
+    @sio.event
+    def incoming_sdp(data):
+        handle_incoming_sdp(data)
 
     # actually connect now
     try:
