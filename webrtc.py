@@ -1,7 +1,7 @@
 import cv2
 import asyncio
 import socketio
-from rtc_logic import offer, handle_connect, handle_incoming_sdp, handle_incoming_sdp_notasync
+from rtc_logic import offer, handle_connect, handle_incoming_sdp
 
 import numpy as np
 from webcoords import get_limits
@@ -9,26 +9,26 @@ from webcoords import get_limits
 async def main():
 
     # all the socket.io stuff
-    sio = socketio.Client()
+    sio = socketio.AsyncClient()
 
     @sio.event
-    def connect():
-        handle_connect(sio)
+    async def connect():
+        await handle_connect(sio)
 
 
     @sio.event
-    def disconnect():
+    async def disconnect():
         print('disconnected from server')
-        sio.emit('pythonDisconnect')
+        await sio.emit('pythonDisconnect')
 
     # define a function to answer an incoming SDP
     @sio.event
-    def incoming_sdp(data):
-        handle_incoming_sdp_notasync(data, sio)
+    async def incoming_sdp(data):
+        await handle_incoming_sdp(data, sio)
 
     # actually connect now
     try:
-        sio.connect('http://localhost:5000')
+        await sio.connect('http://localhost:5000')
         # send the SDP connection request to all connected JS clients
     except:
         print("Could not connect: {e}")
