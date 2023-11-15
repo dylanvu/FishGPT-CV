@@ -20,14 +20,15 @@ async def offer(sio):
         "type": offer.type,
         "sdp": offer.sdp,
     }
-    print("sending offer dict")
+    print("sending offer")
     # print(offer_dict)
-    sio.emit("pythonOffer", {"data": offer_dict})
+    await sio.emit("pythonOffer", {"data": offer_dict})
+    print("done sending offer dict")
 
-def handle_connect(sio):
+async def handle_connect(sio):
     print('connection established')
     # send message with the socket io
-    sio.emit('pythonConnect')
+    await sio.emit('pythonConnect')
 
 async def handle_incoming_sdp(data, sio):
     print("incoming sdp")
@@ -43,10 +44,7 @@ async def answer(sdp, sio):
     answer_dict = {
         "type": rtcAnswer.type,
         "sdp": rtcAnswer.sdp,
-        "socketId": sio.id
+        "socketId": sio.sid
     }
     print(answer_dict)
-    sio.emit('pythonAnswer', answer_dict)
-
-def handle_incoming_sdp_notasync(data, sio):
-    print("incoming sdp")
+    await sio.emit('pythonAnswer', answer_dict)
