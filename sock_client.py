@@ -3,7 +3,6 @@ import asyncio
 import socketio
 import base64
 import numpy as np
-from webcoords import get_limits
 
 async def main():
     # create socket.io connection
@@ -25,17 +24,12 @@ async def main():
             # handling color detection
             # convert BGR color space to RGB
             hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            
-            lowerLimit, upperLimit = get_limits(color=Orange)
-            
-            mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)
-            cv2.imshow('frame', mask)
-            if (fCount % 1000 == 0):
+            if (fCount % 10000 == 0):
                 # convert to base64 to emit as data
                 retval, buffer = cv2.imencode('.jpg', frame)
                 jpg_as_text = base64.b64encode(buffer)
                 print("image sent")
-                sio.emit("imageSend", {"data": jpg_as_text})
+                sio.emit("imageSend", {"data": jpg_as_text.decode('utf-8')})
                 # also send the coordinates
                 sio.emit("coordsSend", {"data": {"x": 1, "y": 2}})
                 fCount = 0
