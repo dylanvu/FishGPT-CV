@@ -51,9 +51,16 @@ async def main():
         ret, frame = cap.read()
 
         mask = colorMask(frame)
+        kernel = np.ones((5,5),np.uint8)
+        # erosion = cv2.erode(mask,kernel,iterations = 1)
+        # Bitwise-AND mask and original image
+        res = cv2.bitwise_and(frame,frame, mask= mask)
         
         # split frame into quadrants
         quadrants = createQuadrants(frame)
+        
+        # cv2.imshow('frame', mask)
+        cv2.imshow('res', res)
         
         # DEBUGGING PRINTS
         # Display the quadrants
@@ -92,7 +99,7 @@ async def main():
 
         
         # displays fish w/o box
-        cv2.imshow('frame', frame)
+        # cv2.imshow('frame', frame)
         # displays fish with box
         # cv2.imshow('frame', frameBox)
         
