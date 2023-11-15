@@ -61,7 +61,7 @@ async def main():
                 frameBox = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
             cv2.imshow('frame', frame)
 
-            if (fCount % 10000 == 0):
+            if (fCount % 10 == 0):
                 # convert to base64 to emit as data
                 retval, buffer = cv2.imencode('.jpg', frame)
                 jpg_as_text = base64.b64encode(buffer)
@@ -73,6 +73,10 @@ async def main():
                 fCount = 0
             else:
                 fCount += 1
+            # press q to quit
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
 
     # actually connect now
     try:
