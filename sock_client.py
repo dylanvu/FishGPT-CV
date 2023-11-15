@@ -36,6 +36,8 @@ async def main():
                 jpg_as_text = base64.b64encode(buffer)
                 print("image sent")
                 sio.emit("imageSend", {"data": jpg_as_text})
+                # also send the coordinates
+                sio.emit("coordsSend", {"data": {"x": 1, "y": 2}})
                 fCount = 0
             else:
                 fCount += 1
@@ -49,6 +51,7 @@ async def main():
     # actually connect now
     try:
         print("connecting to socket.io server")
+        # sio.connect('https://3540-76-78-137-148.ngrok-free.app')
         sio.connect('http://localhost:5000')
     except Exception as e:
         print(e)
