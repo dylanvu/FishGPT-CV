@@ -1,7 +1,7 @@
 import cv2
 import asyncio
 import socketio
-
+import base64
 import numpy as np
 from webcoords import get_limits
 
@@ -30,9 +30,12 @@ async def main():
             
             mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)
             cv2.imshow('frame', mask)
-            print("before")
             if (fCount % 1000 == 0):
-                sio.emit("test", {"data": "test"})
+                # convert to base64 to emit as data
+                retval, buffer = cv2.imencode('.jpg', frame)
+                jpg_as_text = base64.b64encode(buffer)
+                print("image sent")
+                sio.emit("imageSend", {"data": jpg_as_text})
                 fCount = 0
             else:
                 fCount += 1
