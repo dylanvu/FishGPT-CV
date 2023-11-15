@@ -33,16 +33,29 @@ def colorMask(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
     orange = np.uint8([[[32, 68, 146]]])
+    
     # convert the color to HSV
     hsvOrange = cv2.cvtColor(orange, cv2.COLOR_BGR2HSV)
     print("HSVORANGE: ", hsvOrange)
+    
+    
     # Define the HSV range for orange
     # orange is 27, 99, 233 BGR
     lower_orange = np.array([-1, 99, 46])
     upper_orange = np.array([19, 209, 156])
     
-    # create the mask
-    mask = cv2.inRange(hsv, lower_orange, upper_orange)
+    # # white
+    # body = np.uint8([[[99, 144, 155]]])
+    # hsvBody = cv2.cvtColor(body, cv2.COLOR_BGR2HSV)
+    # print("HSVBODY: ", hsvBody)
+    # # white HSV: 24, 92, 155
+    # lower_body = np.array([14, -2, 55])
+    # upper_body = np.array([34, 192, 255])
+    # maskBody = cv2.inRange(hsv, lower_body, upper_body)
     
+    # create the mask
+    maskOrange = cv2.inRange(hsv, lower_orange, upper_orange)
+    
+    mask = maskOrange
     return mask
     
