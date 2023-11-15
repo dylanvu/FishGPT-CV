@@ -15,6 +15,7 @@ async def main():
 
         cap = cv2.VideoCapture(0)
         fCount = 0
+        coord = None
         
         while True:
             ret, frame = cap.read()
@@ -61,16 +62,17 @@ async def main():
             cv2.imshow('frame', frame)
 
             if (fCount % 10000 == 0):
-                    # convert to base64 to emit as data
-                    retval, buffer = cv2.imencode('.jpg', frame)
-                    jpg_as_text = base64.b64encode(buffer)
-                    print("image sent")
-                    sio.emit("imageSend", {"data": jpg_as_text.decode('utf-8')})
-                    # also send the coordinates
-                    sio.emit("coordsSend", {"data": {"x": 1, "y": 2}})
-                    fCount = 0
+                # convert to base64 to emit as data
+                retval, buffer = cv2.imencode('.jpg', frame)
+                jpg_as_text = base64.b64encode(buffer)
+                print("image sent")
+                sio.emit("imageSend", {"data": jpg_as_text.decode('utf-8')})
+                # also send the coordinates
+                if (coord is not None):
+                    sio.emit("coordsSend", {"data": {"x": coord[0], "y": coord[1], "quadrant": quad}})
+                fCount = 0
             else:
-                    fCount += 1
+                fCount += 1
 
     # actually connect now
     try:
