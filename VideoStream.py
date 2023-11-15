@@ -6,6 +6,17 @@ import numpy as np
 from webcoords import colorMask, createQuadrants, checkCoordinate, findMidpoint
 from PIL import Image
 
+# Function to find the largest contour in the mask
+def find_largest_contour(mask, min_contour_area):
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if contours:
+        largest_contour = max(contours, key=cv2.contourArea)
+        # do not show anything below min contour area specified
+        if cv2.contourArea(largest_contour) > min_contour_area:
+            return largest_contour
+    else:
+        return None
+
 async def main():
     # create socket.io connection
     sio = socketio.Client()
@@ -21,10 +32,29 @@ async def main():
             ret, frame = cap.read()
 
             mask = colorMask(frame)
+
+            # Find the largest contour in the mask
+            largest_contour = find_largest_contour(mask, 2)
             
             # split frame into quadrants
             quadrants = createQuadrants(frame)
             
+            if largest_contour is not None:
+                # Get the bounding box of the largest contour
+                x, y, w, h = cv2.boundingRect(largest_contour)
+
+                # Draw a rectangle around the largest contour
+                frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 5)
+                    # Calculates coordinates, by calculating the center of the box that highlights the fish
+                coord = findMidpoint(x, x + w, y, y + h)
+                quad = checkCoordinate(coord[0], coord[1], quadrants)
+                
+                # DEBUG PRINTS
+                print("COORD: ", coord)
+                print("QUADRANT IT IS IN: ", quad)
+            cv2.imshow('frame', frame)
+
+
             # DEBUGGING PRINTS
             # Display the quadrants
             # print("QUADRANTS")
@@ -36,30 +66,30 @@ async def main():
             # actualQuad = checkCoordinate(coords[0], coords[1], quadrants)
             # print("QUADRANT IT IS IN: ", actualQuad)
             # creating box to highlight fish
-            mask_ = Image.fromarray(mask)
+            # mask_ = Image.fromarray(mask)
             
-            bbox = mask_.getbbox()
+            # bbox = mask_.getbbox()
             
-            if bbox is not None:
-                x1, y1, x2, y2 = bbox
+            # if bbox is not None:
+            #     x1, y1, x2, y2 = bbox
                 
-                # DEBUG PRINTS
-                # print("x1: ", x1)
-                # print("x2: ", x2)
-                # print("y1: ", y1)
-                # print("y2: ", y2)
+            #     # DEBUG PRINTS
+            #     # print("x1: ", x1)
+            #     # print("x2: ", x2)
+            #     # print("y1: ", y1)
+            #     # print("y2: ", y2)
                 
-                # Calculates coordinates, by calculating the center of the box that highlights the fish
-                coord = findMidpoint(x1, x2, y1, y2)
-                quad = checkCoordinate(coord[0], coord[1], quadrants)
+            #     # Calculates coordinates, by calculating the center of the box that highlights the fish
+            #     coord = findMidpoint(x1, x2, y1, y2)
+            #     quad = checkCoordinate(coord[0], coord[1], quadrants)
                 
-                # DEBUG PRINTS
-                print("COORD: ", coord)
-                print("QUADRANT IT IS IN: ", quad)
+            #     # DEBUG PRINTS
+            #     print("COORD: ", coord)
+            #     print("QUADRANT IT IS IN: ", quad)
                 
-                # Creates the frame around the goldfish
-                frameBox = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
-            cv2.imshow('frame', frame)
+            #     # Creates the frame around the goldfish
+            #     frameBox = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
+            # cv2.imshow('frame', frame)
 
             if (fCount % 10 == 0):
                 # convert to base64 to emit as data
