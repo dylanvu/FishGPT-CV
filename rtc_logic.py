@@ -1,4 +1,3 @@
-from VideoStream import VideoStream
 from aiortc import RTCPeerConnection, RTCSessionDescription
 
 def createPeerConnection():

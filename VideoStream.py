@@ -8,7 +8,15 @@ from PIL import Image
 
 # Function to find the largest contour in the mask
 def find_largest_contour(mask, min_contour_area):
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Convert the image to grayscale (single-channel)
+    grayscale_result = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+
+    # Threshold the image to create a binary mask
+    _, binary_mask = cv2.threshold(grayscale_result, 1, 255, cv2.THRESH_BINARY)
+
+    # Find contours in the binary mask
+    contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
     if contours:
         largest_contour = max(contours, key=cv2.contourArea)
         # do not show anything below min contour area specified
@@ -32,9 +40,13 @@ async def main():
             ret, frame = cap.read()
 
             mask = colorMask(frame)
+            kernel = np.ones((5,5),np.uint8)
+            # erosion = cv2.erode(mask,kernel,iterations = 1)
+            # Bitwise-AND mask and original image
+            res = cv2.bitwise_and(frame,frame, mask= mask)
 
             # Find the largest contour in the mask
-            largest_contour = find_largest_contour(mask, 2)
+            largest_contour = find_largest_contour(res, 2)
             
             # split frame into quadrants
             quadrants = createQuadrants(frame)
