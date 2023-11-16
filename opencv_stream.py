@@ -10,6 +10,7 @@ async def main():
 
     @sio.event
     def connect():
+        print("CONNECTED")
 
         cap = cv2.VideoCapture(0)
         
@@ -38,15 +39,27 @@ async def main():
             x, y, w, h = roi
             frame = frame[y:y+h, x:x+w]
             
+            # Resize the frame
+            new_width = 640  # New width
+            new_height = 480  # New height
+            frame = cv2.resize(frame, (new_width, new_height))
+
+            
             cv2.imshow('frame', frame)
 
 
-            # 30 ms delay
-            key = cv2.waitKey(30) & 0xFF
-            # convert to base64 to emit as data
-            retval, buffer = cv2.imencode('.jpg', frame)
+            # Encode the frame with a specified JPEG compression quality (e.g., 50)
+            jpeg_quality = 50  # Adjust this value as needed
+            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality]
+            retval, buffer = cv2.imencode('.jpg', frame, encode_param)
+            
             jpg_as_text = base64.b64encode(buffer)
             sio.emit("imageSend", {"data": jpg_as_text.decode('utf-8')})
+
+            cv2.imshow('frame', frame)
+
+            # 30 ms delay
+            key = cv2.waitKey(30) & 0xFF
             # press q to quit
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -56,7 +69,7 @@ async def main():
     try:
         print("connecting to socket.io server")
         # sio.connect('https://3540-76-78-137-148.ngrok-free.app')
-        sio.connect('https://fishgpt-backend.dylanvu9.repl.co/')
+        sio.connect('https://fishgpt-backend.dylanvu9.repl.co/', wait_timeout=10)
     except Exception as e:
         print(e)
     
