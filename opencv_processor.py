@@ -36,7 +36,8 @@ def main():
         print("we are connected!")
 
     @sio.event
-    def imageSend(data):
+    def imageReceive(data):
+        print("image received")
         # decode the base64-encoded string to bytes
         decoded_image = base64.b64decode(data["data"])
 
