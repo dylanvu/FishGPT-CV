@@ -32,12 +32,35 @@ async def main():
     @sio.event
     def connect():
 
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)
+        
+        # DOES SOMETHING
+        codec = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+        cap.set(6, codec)
+        cap.set(5, 30)
+        cap.set(3, 1920)
+        cap.set(4, 1080)
+
+        
         fCount = 0
         coord = None
         
+        # Camera, fixing fisheye
+        cameraMatrix = np.genfromtxt("./camera_matrix.txt")
+        dist = np.genfromtxt("./distortion.txt")
+        
+        ret, frame = cap.read()
+        h, w = frame.shape[:2]
+        
+        newCameraMatrix, roi = cv2. getOptimalNewCameraMatrix(cameraMatrix, dist, (w, h), 1, (w, h))
+        
         while True:
             ret, frame = cap.read()
+            
+            # undistorts the fisheye frame
+            frame = cv2.undistort(frame, cameraMatrix, dist, None, newCameraMatrix)
+            x, y, w, h = roi
+            frame = frame[y:y+h, x:x+w]
 
             mask = colorMask(frame)
             kernel = np.ones((5,5),np.uint8)
@@ -111,7 +134,7 @@ async def main():
             #     frameBox = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
             # cv2.imshow('frame', frame)
 
-            if (fCount % 10 == 0):
+            if (fCount % 1000000 == 0):
                 # convert to base64 to emit as data
                 retval, buffer = cv2.imencode('.jpg', frame)
                 jpg_as_text = base64.b64encode(buffer)
