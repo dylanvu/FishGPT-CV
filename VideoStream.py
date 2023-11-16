@@ -32,7 +32,7 @@ async def main():
     @sio.event
     def connect():
 
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(1)
         fCount = 0
         coord = None
         
@@ -41,9 +41,13 @@ async def main():
 
             mask = colorMask(frame)
             kernel = np.ones((5,5),np.uint8)
-            # erosion = cv2.erode(mask,kernel,iterations = 1)
+            # removes small noise
+            erosion = cv2.erode(mask,kernel,iterations = 1)
+            # fills gaps, connects nearby regions
+            img_dilation = cv2.dilate(erosion, kernel, iterations=1)
+            
             # Bitwise-AND mask and original image
-            res = cv2.bitwise_and(frame,frame, mask= mask)
+            res = cv2.bitwise_and(frame,frame, mask= img_dilation)
 
             # Find the largest contour in the mask
             largest_contour = find_largest_contour(res, 2)
@@ -64,6 +68,10 @@ async def main():
                 # DEBUG PRINTS
                 print("COORD: ", coord)
                 print("QUADRANT IT IS IN: ", quad)
+            
+            # bit mask showing
+            cv2.imshow('bitmask', res)
+            # regular showing with frame
             cv2.imshow('frame', frame)
 
 

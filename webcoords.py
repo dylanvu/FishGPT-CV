@@ -32,7 +32,9 @@ def colorMask(frame):
     # converting BGR to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
-    orange = np.uint8([[[32, 68, 146]]])
+    # orange = np.uint8([[[32, 68, 146]]])
+    orange = np.uint8([[[66, 83, 139]]])
+    
     
     # convert the color to HSV
     # hsvOrange = cv2.cvtColor(orange, cv2.COLOR_BGR2HSV)
@@ -41,8 +43,10 @@ def colorMask(frame):
     
     # Define the HSV range for orange
     # orange is 27, 99, 233 BGR
-    lower_orange = np.array([-1, 99, 46])
-    upper_orange = np.array([19, 209, 156])
+    # lower_orange = np.array([-1, 99, 46])
+    # upper_orange = np.array([19, 209, 156])
+    lower_orange = np.array([-3, 34, 39])
+    upper_orange = np.array([17, 234, 239])
     
     # # white
     # body = np.uint8([[[99, 144, 155]]])

@@ -45,16 +45,21 @@ async def main():
     # now do all the openCV stuff
     # Turning Camera On -------------------------------------
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     
     while True:
         ret, frame = cap.read()
 
         mask = colorMask(frame)
+        
         kernel = np.ones((5,5),np.uint8)
-        # erosion = cv2.erode(mask,kernel,iterations = 1)
+        # removes small noise
+        erosion = cv2.erode(mask,kernel,iterations = 1)
+        # fills gaps, connects nearby regions
+        img_dilation = cv2.dilate(erosion, kernel, iterations=1)
+        
         # Bitwise-AND mask and original image
-        res = cv2.bitwise_and(frame,frame, mask= mask)
+        res = cv2.bitwise_and(frame,frame, mask= img_dilation)
         
         # split frame into quadrants
         quadrants = createQuadrants(frame)
