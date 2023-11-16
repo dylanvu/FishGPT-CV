@@ -1,2 +1,2 @@
 * ssh: https://stackoverflow.com/questions/71804429/raspberry-pi-ssh-access-denied
-* WiFi: https://linuxhint.com/check-internet-connectivity-raspberry-pi-terminal/
+* WiFi: https://weworkweplay.com/play/automatically-connect-a-raspberry-pi-to-a-wifi-network/
