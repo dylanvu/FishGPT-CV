@@ -6,12 +6,13 @@ import numpy as np
 
 from webcoords import colorMask, createQuadrants, checkCoordinate, findMidpoint
 from PIL import Image
+import random
 
 # Function to return emoji depending on quadrant
 EmojiDic = {"<(O w O)>": 0, "<(.-.)>": 1, "<(T^T)>": 2, "<(O _ O)>": 3}
 EmojiArr = ["<(O w O)>", "<(.-.)>", "<(T^T)>", "<(O _ O)>"]
 def shuffleEmojis():
-    EmojiArr.shuffle()
+    random.shuffle(EmojiArr)
     
     
 # Function to find the largest contour in the mask
