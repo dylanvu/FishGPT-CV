@@ -69,7 +69,7 @@ async def main():
     try:
         print("connecting to socket.io server")
         # sio.connect('https://3540-76-78-137-148.ngrok-free.app')
-        sio.connect('https://fishgpt-backend.dylanvu9.repl.co/', wait_timeout=10)
+        sio.connect('marshy-glaze-brazil.glitch.me/', wait_timeout=10)
     except Exception as e:
         print(e)
     

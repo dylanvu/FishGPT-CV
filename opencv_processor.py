@@ -84,7 +84,7 @@ def main():
     try:
         print("connecting to socket.io server")
         # sio.connect('https://3540-76-78-137-148.ngrok-free.app')
-        sio.connect('https://fishgpt-backend.dylanvu9.repl.co/')
+        sio.connect('https://marshy-glaze-brazil.glitch.me/')
     except Exception as e:
         print(e)
     
