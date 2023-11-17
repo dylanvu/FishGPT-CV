@@ -8,15 +8,11 @@ from webcoords import colorMask, createQuadrants, checkCoordinate, findMidpoint
 from PIL import Image
 
 # Function to return emoji depending on quadrant
-def give_emoji(quadrant):
-    if quadrant == 0:
-        return "<(O w O)>" # happy 
-    elif quadrant == 1:
-        return "<(.-.)>" # disappointed
-    elif quadrant == 2: 
-        return "<(T^T)>" # sad
-    elif quadrant == 3:
-        return "<(O _ O)>" # surprised
+EmojiDic = {"<(O w O)>": 0, "<(.-.)>": 1, "<(T^T)>": 2, "<(O _ O)>": 3}
+EmojiArr = ["<(O w O)>", "<(.-.)>", "<(T^T)>", "<(O _ O)>"]
+def shuffleEmojis():
+    EmojiArr.shuffle()
+    
     
 # Function to find the largest contour in the mask
 def find_largest_contour(mask, min_contour_area):
@@ -45,7 +41,7 @@ def draw_thought_bubble(frame, x, y, text="Thoughts"):
 async def main():
     # create socket.io connection
     sio = socketio.Client()
-
+    fCount = 0
     @sio.event
     def connect():
         print("CONNECTED")
@@ -98,7 +94,10 @@ async def main():
             
             # split frame into quadrants
             quadrants = createQuadrants(frame)
-        
+            # shuffle the emojis once in a while
+            if (fCount % 100000 == 0):
+                shuffleEmojis()
+                
             if largest_contour is not None:
                 # Get the bounding box of the largest contour
                 x, y, w, h = cv2.boundingRect(largest_contour)
@@ -110,7 +109,9 @@ async def main():
                 quad = checkCoordinate(coord[0], coord[1], quadrants)
                 
                 # Create a thought bubble
-                draw_thought_bubble(frame, x, y - 50, give_emoji(quad))
+                # get the emotion based on the quadrant
+                emotion = EmojiArr[quad]
+                draw_thought_bubble(frame, x, y - 50, emotion)
                 
                 # # DEBUG PRINTS
                 # print("COORD: ", coord)
@@ -119,7 +120,9 @@ async def main():
                 # send the coordinates
                 if (coord is not None):
                     # sio.emit("coordsSend", {"data": {"x": coord[0], "y": coord[1], "quadrant": quad}})
-                    sio.emit("coordsSend", {"data": {"quadrant": quad}})
+                    # this gives the frontend a consistent "quadrant" associated with each emotion, despite the emoji array shuffling around
+                    emotionIndex = EmojiDic[emotion]
+                    sio.emit("coordsSend", {"data": {"quadrant": emotionIndex}})
                     
             
             cv2.imshow('frame', frame)
