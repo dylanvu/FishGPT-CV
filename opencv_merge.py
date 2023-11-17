@@ -98,6 +98,9 @@ async def main():
             # shuffle the emojis once in a while
             if (fCount % 100000 == 0):
                 shuffleEmojis()
+                fCount = 0
+            else:
+                fCount += 1
                 
             if largest_contour is not None:
                 # Get the bounding box of the largest contour
