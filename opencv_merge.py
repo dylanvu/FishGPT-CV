@@ -96,16 +96,6 @@ async def main():
             # Find the largest contour in the mask
             largest_contour = find_largest_contour(res, 2)
             
-            cv2.imshow('frame', frame)
-
-
-            # Encode the frame with a specified JPEG compression quality (e.g., 50)
-            jpeg_quality = 50  # Adjust this value as needed
-            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality]
-            retval, buffer = cv2.imencode('.jpg', frame, encode_param)
-            
-            jpg_as_text = base64.b64encode(buffer)
-
             # split frame into quadrants
             quadrants = createQuadrants(frame)
         
@@ -127,10 +117,19 @@ async def main():
                 # print("QUADRANT IT IS IN: ", quad)
                 
                 # send the coordinates
-                # if (coord is not None):
+                if (coord is not None):
                     # sio.emit("coordsSend", {"data": {"x": coord[0], "y": coord[1], "quadrant": quad}})
+                    sio.emit("coordsSend", {"data": {"quadrant": quad}})
+                    
             
             cv2.imshow('frame', frame)
+            
+            # Encode the frame with a specified JPEG compression quality (e.g., 50)
+            jpeg_quality = 50  # Adjust this value as needed
+            encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality]
+            retval, buffer = cv2.imencode('.jpg', frame, encode_param)
+            
+            jpg_as_text = base64.b64encode(buffer)
             sio.emit("imageSend", {"data": jpg_as_text.decode('utf-8')})
                
             # 30 ms delay
