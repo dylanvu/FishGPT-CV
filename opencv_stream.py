@@ -8,6 +8,8 @@ async def main():
     # create socket.io connection
     sio = socketio.Client()
 
+    cap = None
+
     @sio.event
     def connect():
         print("CONNECTED")
@@ -64,7 +66,11 @@ async def main():
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-
+        @sio.event
+        def disconnect():
+            # destroy windows
+            cv2.destroyAllWindows() 
+            
     # actually connect now
     try:
         print("connecting to socket.io server")
