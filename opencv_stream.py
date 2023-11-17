@@ -8,11 +8,12 @@ async def main():
     # create socket.io connection
     sio = socketio.Client()
 
-    cap = None
+    connected = True
 
     @sio.event
     def connect():
         print("CONNECTED")
+        connected = True
 
         cap = cv2.VideoCapture(0)
         
@@ -32,7 +33,7 @@ async def main():
         
         newCameraMatrix, roi = cv2. getOptimalNewCameraMatrix(cameraMatrix, dist, (w, h), 1, (w, h))
         
-        while True:
+        while connected:
             
             ret, frame = cap.read()
 
@@ -69,8 +70,9 @@ async def main():
         @sio.event
         def disconnect():
             # destroy windows
+            connected = False
             cv2.destroyAllWindows() 
-            
+
     # actually connect now
     try:
         print("connecting to socket.io server")
