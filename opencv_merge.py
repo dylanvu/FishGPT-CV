@@ -15,6 +15,7 @@ EmojiArr = ["<(O w O)>", "<(.-.)>", "<(T^T)>", "<(O _ O)>"]
 def shuffleEmojis(oldepoch):
     if time.time() - oldepoch >= 30:
         # just shuffled, return true
+        print("SHUFFLE MOOD")
         random.shuffle(EmojiArr)
         return True
     else:
@@ -72,6 +73,8 @@ async def main():
         newCameraMatrix, roi = cv2. getOptimalNewCameraMatrix(cameraMatrix, dist, (w, h), 1, (w, h))
         
         justShuffled = True
+        oldtime = time.time()
+        
         
         while True:
             
@@ -107,6 +110,7 @@ async def main():
             if justShuffled:
                 # we just shuffled so save the time
                 oldtime = time.time()
+                justShuffled = False
             else:
                 # is it time to shuffle?
                 justShuffled = shuffleEmojis(oldtime)
