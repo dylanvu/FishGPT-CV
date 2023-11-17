@@ -68,13 +68,18 @@ async def main():
     # actually connect now
     try:
         print("connecting to socket.io server")
-        # sio.connect('https://3540-76-78-137-148.ngrok-free.app')
-        sio.connect('https://marshy-glaze-brazil.glitch.me/', wait_timeout=10)
+        socketServerURL = "https://ea1b-76-78-137-157.ngrok-free.app/"
+        sio.connect(socketServerURL, wait_timeout=10)
     except Exception as e:
         print(e)
     
     while (True):
-        pass
+        if not sio.connected:
+            print("Disconnected. Attempting to reconnect...")
+            try:
+                sio.connect(socketServerURL, wait_timeout=10)
+            except Exception as e:
+                print(e)
 
 if __name__ == "__main__":
     asyncio.run(main())
