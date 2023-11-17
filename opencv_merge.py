@@ -42,11 +42,11 @@ def draw_thought_bubble(frame, x, y, text="Thoughts"):
 async def main():
     # create socket.io connection
     sio = socketio.Client()
-    fCount = 0
     @sio.event
     def connect():
         print("CONNECTED")
 
+        fCount = 0
         cap = cv2.VideoCapture(0)
         
         # Shapes video for fisheye fix adjustment
