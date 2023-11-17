@@ -97,6 +97,9 @@ async def main():
             # regular showing with frame
             cv2.imshow('frame', frame)
 
+            height, width, channels = frame.shape
+            print("HEIGHT: , WIDTH", height, width)
+
 
             # DEBUGGING PRINTS
             # Display the quadrants
@@ -154,8 +157,7 @@ async def main():
     # actually connect now
     try:
         print("connecting to socket.io server")
-        # sio.connect('https://3540-76-78-137-148.ngrok-free.app')
-        sio.connect('https://fishgpt-backend.dylanvu9.repl.co/')
+        sio.connect('https://ea1b-76-78-137-157.ngrok-free.app/')
     except Exception as e:
         print(e)
     
