@@ -13,8 +13,13 @@ import time
 EmojiDic = {"<(O w O)>": 0, "<(.-.)>": 1, "<(T^T)>": 2, "<(O _ O)>": 3}
 EmojiArr = ["<(O w O)>", "<(.-.)>", "<(T^T)>", "<(O _ O)>"]
 def shuffleEmojis(oldepoch):
-    if time.time() - oldepoch >= 60:
+    if time.time() - oldepoch >= 30:
+        # just shuffled, return true
         random.shuffle(EmojiArr)
+        return True
+    else:
+        # not time yet
+        return False
     
     
 # Function to find the largest contour in the mask
@@ -66,6 +71,8 @@ async def main():
         
         newCameraMatrix, roi = cv2. getOptimalNewCameraMatrix(cameraMatrix, dist, (w, h), 1, (w, h))
         
+        justShuffled = True
+        
         while True:
             
             ret, frame = cap.read()
@@ -97,7 +104,12 @@ async def main():
             # split frame into quadrants
             quadrants = createQuadrants(frame)
             # shuffle the emojis once in a while
-            shuffleEmojis(30)
+            if justShuffled:
+                # we just shuffled so save the time
+                oldtime = time.time()
+            else:
+                # is it time to shuffle?
+                justShuffled = shuffleEmojis(oldtime)
                 
             if largest_contour is not None:
                 # Get the bounding box of the largest contour
