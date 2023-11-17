@@ -120,7 +120,8 @@ async def main():
                 x, y, w, h = cv2.boundingRect(largest_contour)
 
                 # Draw a rectangle around the largest contour
-                frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 5)
+                padding = 10
+                frame = cv2.rectangle(frame, (x - padding, y - padding), (x + w + padding, y + h + padding), (0, 255, 0), 1)
                     # Calculates coordinates, by calculating the center of the box that highlights the fish
                 coord = findMidpoint(x, x + w, y, y + h)
                 quad = checkCoordinate(coord[0], coord[1], quadrants)
