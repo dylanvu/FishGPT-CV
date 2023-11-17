@@ -6,7 +6,6 @@ import numpy as np
 
 from webcoords import colorMask, createQuadrants, checkCoordinate, findMidpoint
 from PIL import Image
-import emoji
 
 # Function to return emoji depending on quadrant
 def give_emoji(quadrant):
