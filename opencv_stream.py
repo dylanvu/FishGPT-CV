@@ -8,9 +8,12 @@ async def main():
     # create socket.io connection
     sio = socketio.Client()
 
+    connected = True
+
     @sio.event
     def connect():
         print("CONNECTED")
+        connected = True
 
         cap = cv2.VideoCapture(0)
         
@@ -30,7 +33,7 @@ async def main():
         
         newCameraMatrix, roi = cv2. getOptimalNewCameraMatrix(cameraMatrix, dist, (w, h), 1, (w, h))
         
-        while True:
+        while connected:
             
             ret, frame = cap.read()
 
@@ -64,17 +67,27 @@ async def main():
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
+        @sio.event
+        def disconnect():
+            # destroy windows
+            connected = False
+            cv2.destroyAllWindows() 
 
     # actually connect now
     try:
         print("connecting to socket.io server")
-        # sio.connect('https://3540-76-78-137-148.ngrok-free.app')
-        sio.connect('https://fishgpt-backend.dylanvu9.repl.co/', wait_timeout=10)
+        socketServerURL = "https://ea1b-76-78-137-157.ngrok-free.app/"
+        sio.connect(socketServerURL, wait_timeout=10)
     except Exception as e:
         print(e)
     
     while (True):
-        pass
+        if not sio.connected:
+            print("Disconnected. Attempting to reconnect...")
+            try:
+                sio.connect(socketServerURL, wait_timeout=10)
+            except Exception as e:
+                print(e)
 
 if __name__ == "__main__":
     asyncio.run(main())
