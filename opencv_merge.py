@@ -7,12 +7,14 @@ import numpy as np
 from webcoords import colorMask, createQuadrants, checkCoordinate, findMidpoint
 from PIL import Image
 import random
+import time
 
 # Function to return emoji depending on quadrant
 EmojiDic = {"<(O w O)>": 0, "<(.-.)>": 1, "<(T^T)>": 2, "<(O _ O)>": 3}
 EmojiArr = ["<(O w O)>", "<(.-.)>", "<(T^T)>", "<(O _ O)>"]
-def shuffleEmojis():
-    random.shuffle(EmojiArr)
+def shuffleEmojis(oldepoch):
+    if time.time() - oldepoch >= 60:
+        random.shuffle(EmojiArr)
     
     
 # Function to find the largest contour in the mask
@@ -46,7 +48,6 @@ async def main():
     def connect():
         print("CONNECTED")
 
-        fCount = 0
         cap = cv2.VideoCapture(0)
         
         # Shapes video for fisheye fix adjustment
@@ -96,11 +97,7 @@ async def main():
             # split frame into quadrants
             quadrants = createQuadrants(frame)
             # shuffle the emojis once in a while
-            if (fCount % 100000 == 0):
-                shuffleEmojis()
-                fCount = 0
-            else:
-                fCount += 1
+            shuffleEmojis(30)
                 
             if largest_contour is not None:
                 # Get the bounding box of the largest contour
