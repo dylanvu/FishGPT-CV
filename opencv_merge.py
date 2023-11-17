@@ -105,9 +105,6 @@ async def main():
             retval, buffer = cv2.imencode('.jpg', frame, encode_param)
             
             jpg_as_text = base64.b64encode(buffer)
-            sio.emit("imageSend", {"data": jpg_as_text.decode('utf-8')})
-
-            cv2.imshow('frame', frame)
 
             # split frame into quadrants
             quadrants = createQuadrants(frame)
@@ -134,6 +131,7 @@ async def main():
                     # sio.emit("coordsSend", {"data": {"x": coord[0], "y": coord[1], "quadrant": quad}})
             
             cv2.imshow('frame', frame)
+            sio.emit("imageSend", {"data": jpg_as_text.decode('utf-8')})
                
             # 30 ms delay
             key = cv2.waitKey(30) & 0xFF
